@@ -1,4 +1,5 @@
 use std::{convert::TryInto, fs};
+///solving both parts of day 1
 fn main() {
     println!("Welcome to Day 1!");
     let nums = read_input("input/Day01.txt");
@@ -9,6 +10,20 @@ fn main() {
     let product_with_counts = mult_by_count(&first_list, &second_list);
     println!("Day 1 Part 1: {:?}", diffs);
     println!("Day 1 Part 2: {:?}", product_with_counts);
+}
+/// solving part 1 of day 1 - used for testing
+fn sol_day1_part1(filename: &str) -> i32 {
+    let nums = read_input(filename);
+    let first_list = extract_first_list(&nums);
+    let second_list = extract_second_list(&nums);
+    let zipped_lists = zip_lists(&first_list, &second_list);
+    sum_differences(&zipped_lists)
+}
+fn sol_day1_part2(filename: &str) -> i32 {
+    let nums = read_input(filename);
+    let first_list = extract_first_list(&nums);
+    let second_list = extract_second_list(&nums);
+    mult_by_count(&first_list, &second_list)
 }
 fn read_input(filename: &str) -> Vec<Vec<i32>> {
     let contents = fs::read_to_string(filename).unwrap();
@@ -27,16 +42,13 @@ fn extract_first_list(numlist: &Vec<Vec<i32>>) -> Vec<i32> {
     let mut first_list = numlist.iter().map(|l| l[0]).collect::<Vec<i32>>();
     first_list.sort();
     first_list
-    
 }
 fn extract_second_list(numlist: &Vec<Vec<i32>>) -> Vec<i32> {
     let mut second_list = numlist.iter().map(|l| l[1]).collect::<Vec<i32>>();
     second_list.sort();
     second_list
-    
 }
-fn zip_lists<'a>(first_list: &'a Vec<i32>, second_list:&'a Vec<i32>) -> Vec<(&'a i32, &'a i32)> {
-
+fn zip_lists<'a>(first_list: &'a Vec<i32>, second_list: &'a Vec<i32>) -> Vec<(&'a i32, &'a i32)> {
     let zipped = first_list
         .into_iter()
         .zip(second_list.into_iter())
@@ -47,10 +59,33 @@ fn sum_differences(numtuples: &Vec<(&i32, &i32)>) -> i32 {
     numtuples.iter().map(|l| (l.0 - l.1).abs()).sum()
 }
 
-fn count_occurrances(elem: i32, list:&Vec<i32>) -> i32{
-    list.iter().filter(|&n| *n == elem).count().try_into().unwrap()
+fn count_occurrances(elem: i32, list: &Vec<i32>) -> i32 {
+    list.iter()
+        .filter(|&n| *n == elem)
+        .count()
+        .try_into()
+        .unwrap()
 }
 
-fn mult_by_count(list1: &Vec<i32>, list2: &Vec<i32>) -> i32{
-    list1.iter().map(|elem| count_occurrances(*elem, list2) * elem).sum::<i32>().try_into().unwrap()
+fn mult_by_count(list1: &Vec<i32>, list2: &Vec<i32>) -> i32 {
+    list1
+        .iter()
+        .map(|elem| count_occurrances(*elem, list2) * elem)
+        .sum::<i32>()
+        .try_into()
+        .unwrap()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn day1a_test() {
+        assert_eq!(sol_day1_part1("input/Day01example.txt"), 11);
+    }
+    #[test]
+    fn day1b_test() {
+        assert_eq!(sol_day1_part2("input/Day01example.txt"), 31);
+    }
 }
