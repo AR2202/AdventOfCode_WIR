@@ -3,11 +3,13 @@ use std::fs;
 fn main() {
     let contents = fs::read_to_string("input/day06.txt").expect("File not found");
     let obstacles = make_obstacle_dict(&contents);
-    let non_obstacltes = make_non_obstacle_dict(&contents);
-    let all_insert_pos = insert_obstacle(&obstacles, &non_obstacltes);
     let startpos = initital_pos(&contents);
     let limits = grid_limits(&contents);
     let visited = move_to_limits(&startpos, &obstacles, &limits);
+    // too inefficient
+    //let non_obstacles = make_non_obstacle_dict(&contents);
+    //let all_insert_pos = insert_obstacle(&obstacles, &non_obstacles);
+    let all_insert_pos = insert_obstacle(&obstacles, &visited);
     println!("Welcome to Day 6!");
     println!("Part1:{:?}", visited.len());
     let num_loops = all_insert_pos
@@ -183,6 +185,10 @@ fn move_to_outcome(
     curr_pos: &(Coord, Facing),
     limits: &Coord,
 ) -> Outcome {
+    // this is a hack to get rid of the obstacle in the start positions
+    if obstacles.contains(&curr_pos.0) {
+        return Outcome::Escape;
+    }
     // check if we have visited the current position before
     if visited.contains(&curr_pos) {
         return Outcome::Loop;
@@ -207,4 +213,19 @@ fn move_to_outcome(
         next_facing = (next_coord.clone(), f.clone());
     }
     move_to_outcome(obstacles, visited, &next_facing.clone(), &limits)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn day6a_test() {
+        let contents = fs::read_to_string("input/day06ex.txt").expect("File not found");
+        let obstacles = make_obstacle_dict(&contents);
+        let startpos = initital_pos(&contents);
+        let limits = grid_limits(&contents);
+        let visited = move_to_limits(&startpos, &obstacles, &limits);
+        assert_eq!(visited.len(), 41);
+    }
 }
