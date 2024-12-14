@@ -13,8 +13,6 @@ fn main() {
     println!("Welcome to Day 12!");
     let contents = fs::read_to_string("input/day12.txt").expect("File not found");
     let coordmap = coorinates(&contents);
-    let coord1 = (1, 1);
-
     println!(
         "{:?}",
         get_connected_subgraphs(&make_whole_graph(&coordmap, &contents.lines().count()))
