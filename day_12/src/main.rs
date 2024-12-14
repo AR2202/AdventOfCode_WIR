@@ -130,6 +130,6 @@ where
         neighbours_counts.push(neighbors_count.iter().sum());
         fence_cost.push(component_nodes.len() * neighbors_count.iter().sum::<usize>());
     }
-
+    println!("{:?}", subgraphs);
     fence_cost.iter().sum()
 }
