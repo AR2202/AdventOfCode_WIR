@@ -14,7 +14,7 @@ fn main() {
     let contents = fs::read_to_string("input/day12.txt").expect("File not found");
     let coordmap = coorinates(&contents);
     let coord1 = (1, 1);
-    
+
     println!(
         "{:?}",
         get_connected_subgraphs(&make_whole_graph(&coordmap, &contents.lines().count()))
@@ -112,7 +112,6 @@ where
             continue;
         }
 
-        // Collect all nodes in the current component using BFS
         let mut component_nodes = Vec::new();
         let mut bfs = Bfs::new(graph, start);
         let mut neighbors_count = Vec::new();
@@ -130,6 +129,6 @@ where
         neighbours_counts.push(neighbors_count.iter().sum());
         fence_cost.push(component_nodes.len() * neighbors_count.iter().sum::<usize>());
     }
-    println!("{:?}", subgraphs);
+
     fence_cost.iter().sum()
 }
