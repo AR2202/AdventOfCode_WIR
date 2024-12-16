@@ -1,6 +1,7 @@
 extern crate nalgebra as na;
 use na::{ArrayStorage, Dynamic, Matrix2, VecStorage, Vector2, U2, U3};
 use std::fs;
+use std::num;
 fn main() {
     println!("Welcome to Day 13!");
 
@@ -16,19 +17,23 @@ fn win_prize(x_a: i32, x_b: i32, y_a: i32, y_b: i32, x: i32, y: i32) -> (bool, i
     // construct the vector of the solutions
     let mut b = Vector2::new(x as f32, y as f32);
     let decomp = a.lu();
-    // solve
-    let button_presses = decomp.solve(&b).expect("Linear resolution failed.");
+
+
+    let button_presses = decomp.solve(&b).expect("no decomposition possible");
+
     // check if there is an integer solution
-    let button_presses_rounded_a = button_presses[0] as i32;
-    let button_presses_rounded_b = button_presses[1] as i32;
-    let a_is_int = button_presses_rounded_a as f32 == button_presses[0];
-    let b_is_int = button_presses_rounded_b as f32 == button_presses[1];
+    let button_presses_rounded_a = button_presses[0].round();
+    let button_presses_rounded_b = button_presses[1].round();
+    let a_is_int = (button_presses_rounded_a - button_presses[0].abs()).abs() < 0.01;
+    let b_is_int = (button_presses_rounded_b - button_presses[1].abs()).abs() < 0.01;
+   
     return (
         (a_is_int && b_is_int),
-        button_presses_rounded_a,
-        button_presses_rounded_b,
+        button_presses_rounded_a as i32,
+        button_presses_rounded_b as i32,
     );
 }
+
 /// calculates the tokens necessary to win all winable games
 fn calc_tokens(all_button_presses: Vec<(bool, i32, i32)>) -> i32 {
     all_button_presses
@@ -38,7 +43,7 @@ fn calc_tokens(all_button_presses: Vec<(bool, i32, i32)>) -> i32 {
         .sum()
 }
 ///parsing the equations coefficients
-fn parse_input(fname: &str) ->Vec<(i32, i32, i32,i32,i32,i32)>{
+fn parse_input(fname: &str) -> Vec<(i32, i32, i32, i32, i32, i32)> {
     let contents = fs::read_to_string(fname).expect("File not found");
     let mut x_a = 0;
     let mut x_b = 0;
@@ -68,15 +73,14 @@ fn parse_input(fname: &str) ->Vec<(i32, i32, i32,i32,i32,i32)>{
             }
             _ => {}
         }
-        
     }
     equations
 }
 /// passing in the tuple that gets output by parsing step to win_prizes
-fn win_from_tuple(tup: &(i32, i32, i32,i32,i32,i32))->(bool, i32, i32){
+fn win_from_tuple(tup: &(i32, i32, i32, i32, i32, i32)) -> (bool, i32, i32) {
     let (x_a, x_b, y_a, y_b, x_s, y_s) = *tup;
     win_prize(x_a, x_b, y_a, y_b, x_s, y_s)
 }
-fn win_all_prizes(tups: Vec<(i32, i32, i32,i32,i32,i32)>) -> i32{
+fn win_all_prizes(tups: Vec<(i32, i32, i32, i32, i32, i32)>) -> i32 {
     calc_tokens(tups.iter().map(|tup| win_from_tuple(tup)).collect())
 }
