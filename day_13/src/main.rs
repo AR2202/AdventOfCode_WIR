@@ -5,12 +5,12 @@ use std::num;
 fn main() {
     println!("Welcome to Day 13!");
 
-    let res_ex = win_all_prizes(parse_input("input/day13ex.txt",0));
-    let res = win_all_prizes(parse_input("input/day13.txt",0));
+    let res_ex = win_all_prizes(parse_input("input/day13ex.txt", 0));
+    let res = win_all_prizes(parse_input("input/day13.txt", 0));
     println!("example: {:?}", res_ex);
     println!("part1: {:?}", res);
-    let to_add_part2:i64 = 10000000000000;
-    let part2 = win_all_prizes(parse_input("input/day13.txt",to_add_part2));
+    let to_add_part2: i64 = 10000000000000;
+    let part2 = win_all_prizes(parse_input("input/day13.txt", to_add_part2));
     println!("part2: {:?}", part2);
 }
 
@@ -21,7 +21,6 @@ fn win_prize(x_a: i64, x_b: i64, y_a: i64, y_b: i64, x: i64, y: i64) -> (bool, i
     let mut b = Vector2::new(x as f64, y as f64);
     let decomp = a.lu();
 
-
     let button_presses = decomp.solve(&b).expect("no decomposition possible");
 
     // check if there is an integer solution
@@ -29,7 +28,7 @@ fn win_prize(x_a: i64, x_b: i64, y_a: i64, y_b: i64, x: i64, y: i64) -> (bool, i
     let button_presses_rounded_b = button_presses[1].round();
     let a_is_int = (button_presses_rounded_a - button_presses[0].abs()).abs() < 0.01;
     let b_is_int = (button_presses_rounded_b - button_presses[1].abs()).abs() < 0.01;
-   //println!("{:}", button_presses);
+    //println!("{:}", button_presses);
     return (
         (a_is_int && b_is_int),
         button_presses_rounded_a as i64,
@@ -46,7 +45,7 @@ fn calc_tokens(all_button_presses: Vec<(bool, i64, i64)>) -> i64 {
         .sum()
 }
 ///parsing the equations coefficients
-fn parse_input(fname: &str, to_add : i64) -> Vec<(i64, i64, i64, i64, i64, i64)> {
+fn parse_input(fname: &str, to_add: i64) -> Vec<(i64, i64, i64, i64, i64, i64)> {
     let contents = fs::read_to_string(fname).expect("File not found");
     let mut x_a = 0;
     let mut x_b = 0;
@@ -72,7 +71,7 @@ fn parse_input(fname: &str, to_add : i64) -> Vec<(i64, i64, i64, i64, i64, i64)>
             2 => {
                 x_s = e[1][2..e[1].len() - 1].parse::<i64>().unwrap();
                 y_s = e[2][2..].parse::<i64>().unwrap();
-                equations.push((x_a, x_b, y_a, y_b, x_s + to_add, y_s+to_add));
+                equations.push((x_a, x_b, y_a, y_b, x_s + to_add, y_s + to_add));
             }
             _ => {}
         }
