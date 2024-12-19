@@ -17,11 +17,11 @@ fn main() {
     );
     println!(
         "part2 example: {} ",
-        try_all_bytes(&contents, startpoint, endpoint, 12,7));
+        try_all_bytes(&contents, startpoint, endpoint, 12, 7)
+    );
     let contents_inp = fs::read_to_string("input/day18.txt").expect("file not found");
     let (fallen_bytes_inp, rest) = make_bytes_dict(&contents_inp, 1024);
     let graph = make_graph(&fallen_bytes_inp, 71);
-
     let startpoint_p1 = 0;
     let endpoint_p1 = 5040;
     println!(
@@ -30,12 +30,10 @@ fn main() {
     );
     println!(
         "part2: {} ",
-        try_all_bytes(&contents_inp, startpoint_p1, endpoint_p1, 1024,71));
-    // println!(
-    //     "part2: {:?} ",
-    //     find_blocking_all_paths(&graph, startpoint_p1, endpoint_p1, rest)
-    // );
+        try_all_bytes(&contents_inp, startpoint_p1, endpoint_p1, 1024, 71)
+    );
 }
+/// makes a HashSet of all the already fallen bytes
 fn make_bytes_dict(contents: &str, nbytes: usize) -> (HashSet<(u32, u32)>, Vec<(u32, u32)>) {
     let linevec: Vec<&str> = contents.lines().collect();
     (
@@ -51,7 +49,7 @@ fn make_bytes_dict(contents: &str, nbytes: usize) -> (HashSet<(u32, u32)>, Vec<(
             .collect(),
     )
 }
-
+/// makes a graph with connections between coordinates that don't have a fallen byte
 fn make_graph(bytes_dict: &HashSet<(u32, u32)>, limits: u32) -> Graph<u32, u32> {
     let mut edgevec = Vec::new();
     for x in 0..limits {
@@ -78,7 +76,8 @@ fn make_graph(bytes_dict: &HashSet<(u32, u32)>, limits: u32) -> Graph<u32, u32> 
     }
     Graph::<u32, u32>::from_edges(&edgevec)
 }
-fn find_shortest_path(graph: Graph<u32, u32>, startpoint: u32, endpoint: u32) -> u32 {
+/// finds the shortes path
+fn find_shortest_path(graph: Graph<u32, u32>, startpoint: u32, endpoint: u32) -> Option<u32> {
     let path = astar(
         &graph,
         startpoint.into(),
@@ -88,13 +87,13 @@ fn find_shortest_path(graph: Graph<u32, u32>, startpoint: u32, endpoint: u32) ->
     );
 
     match path {
-        Some((w, p)) => w,
-        _ => 0,
+        Some((w, p)) => Some(w),
+        _ => None,
     }
 }
 /// this finds the first one that blocks the path
 /// for every simple path
-/// too inefficient 
+/// too inefficient
 fn find_blocking_all_paths(
     g: &Graph<u32, u32>,
     startpoint: u32,
@@ -106,8 +105,7 @@ fn find_blocking_all_paths(
             let path_as_u32: Vec<u32> = path.into_iter().map(|node| node.index() as u32).collect();
             find_first_byte(path_as_u32, &bytes)
         });
-       
-    
+
     first_blocking.fold(
         (0, (0, 0)),
         |(acci, accb), (i, b)| {
@@ -128,18 +126,26 @@ fn find_first_byte(path: Vec<u32>, bytes: &Vec<(u32, u32)>) -> (usize, (u32, u32
     }
     return (1000000, (0, 0));
 }
-
-fn try_all_bytes(contents_inp:&str, startpoint_p1:u32, endpoint_p1:u32, fallen:usize,limits:u32)->&str{
+/// this tries all bytes after the initial ones and returns the first one that has no
+/// result for path
+fn try_all_bytes(
+    contents_inp: &str,
+    startpoint_p1: u32,
+    endpoint_p1: u32,
+    fallen: usize,
+    limits: u32,
+) -> &str {
     let ls = contents_inp.lines().collect::<Vec<&str>>();
-    for num_bytes in fallen..ls.len(){
+    for num_bytes in fallen..ls.len() {
         let (fallen_bytes_inp, rest) = make_bytes_dict(contents_inp, num_bytes);
         let graph = make_graph(&fallen_bytes_inp, limits);
-        if find_shortest_path(graph, startpoint_p1, endpoint_p1) == 0{
-            return ls[num_bytes-1];
+        match find_shortest_path(graph, startpoint_p1, endpoint_p1) {
+            None => {
+                return ls[num_bytes - 1];
+            }
+            _ => {}
         }
-    
-        
     }
-   
+
     "not found"
 }
